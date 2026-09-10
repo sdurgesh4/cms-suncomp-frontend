@@ -12,13 +12,16 @@ import {
 import ProtectedRoute from "./auth/ProtectedRoute";
 import AdminLayout from "./layouts/AdminLayout";
 
+import TeachersPage from "./pages/admin/TeachersPage";
+import TeacherFormPage from "./pages/admin/TeacherFormPage";
+import TeacherDetailsPage from "./pages/admin/TeacherDetailsPage";
+
 import LoginPage from "./pages/LoginPage";
 import AdminDashboardPage from "./pages/admin/AdminDashboardPage";
 
 import StudentsPage from "./pages/admin/StudentsPage";
 import StudentFormPage from "./pages/admin/StudentFormPage";
 import StudentDetailsPage from "./pages/admin/StudentDetailsPage";
-
 
 export default function App() {
   return (
@@ -57,6 +60,26 @@ export default function App() {
             />
           }
         />
+
+<Route
+  path="teachers"
+  element={<TeachersPage />}
+/>
+
+<Route
+  path="teachers/new"
+  element={<TeacherFormPage />}
+/>
+
+<Route
+  path="teachers/:id"
+  element={<TeacherDetailsPage />}
+/>
+
+<Route
+  path="teachers/:id/edit"
+  element={<TeacherFormPage />}
+/>
 
 
         {/* =========================

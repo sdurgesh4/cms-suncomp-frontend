@@ -1,36 +1,65 @@
-import axios from "./axios";
-import type {
-  User,
-  CreateUserRequest,
-} from "../types/user";
+import api from "./axios";
 
-const BASE_URL = "/admin/users";
+export interface CreateUserRequest {
+  username: string;
+  email: string;
+  password: string;
+  firstName: string;
+  lastName?: string;
+  phone?: string;
+  enabled: boolean;
+  roles: string[];
+}
+
+export interface UserResponse {
+  id: number;
+  username: string;
+  email: string;
+  firstName: string;
+  lastName: string | null;
+  phone: string | null;
+  enabled: boolean;
+  roles: string[];
+}
 
 export const userApi = {
-  getAll: async (): Promise<User[]> => {
-    const response = await axios.get<User[]>(
-      BASE_URL
-    );
+  async getAll(): Promise<UserResponse[]> {
+    const response =
+      await api.get<UserResponse[]>(
+        "/admin/users",
+      );
 
     return response.data;
   },
 
-  getById: async (id: number): Promise<User> => {
-    const response = await axios.get<User>(
-      `${BASE_URL}/${id}`
-    );
+  async getById(
+    id: number,
+  ): Promise<UserResponse> {
+    const response =
+      await api.get<UserResponse>(
+        `/admin/users/${id}`,
+      );
 
     return response.data;
   },
 
-  create: async (
-    data: CreateUserRequest
-  ): Promise<User> => {
-    const response = await axios.post<User>(
-      BASE_URL,
-      data
-    );
+  async create(
+    data: CreateUserRequest,
+  ): Promise<UserResponse> {
+    const response =
+      await api.post<UserResponse>(
+        "/admin/users",
+        data,
+      );
 
     return response.data;
+  },
+
+  async disable(
+    id: number,
+  ): Promise<void> {
+    await api.patch(
+      `/admin/users/${id}/disable`,
+    );
   },
 };
