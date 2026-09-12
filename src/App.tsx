@@ -4,15 +4,12 @@ import {
   Routes,
 } from "react-router-dom";
 
-import {
-  Box,
-  Typography,
-} from "@mui/material";
+import LoginPage from "./pages/LoginPage";
 
 import ProtectedRoute from "./auth/ProtectedRoute";
+
 import AdminLayout from "./layouts/AdminLayout";
 
-import LoginPage from "./pages/LoginPage";
 import AdminDashboardPage from "./pages/admin/AdminDashboardPage";
 
 import StudentsPage from "./pages/admin/StudentsPage";
@@ -23,23 +20,43 @@ import TeachersPage from "./pages/admin/TeachersPage";
 import TeacherFormPage from "./pages/admin/TeacherFormPage";
 import TeacherDetailsPage from "./pages/admin/TeacherDetailsPage";
 
+import CoursesPage from "./pages/admin/CoursesPage";
+import CourseFormPage from "./pages/admin/CourseFormPage";
+import CourseDetailsPage from "./pages/admin/CourseDetailsPage";
+
+import BatchesPage from "./pages/admin/BatchesPage";
+import BatchFormPage from "./pages/admin/BatchFormPage";
+import BatchDetailsPage from "./pages/admin/BatchDetailsPage";
+
+import EnrollmentsPage from "./pages/admin/EnrollmentsPage";
+import EnrollmentFormPage from "./pages/admin/EnrollmentFormPage";
+import EnrollmentDetailsPage from "./pages/admin/EnrollmentDetailsPage";
+
+interface PlaceholderPageProps {
+  title: string;
+}
+
+function PlaceholderPage({
+  title,
+}: PlaceholderPageProps) {
+  return (
+    <div
+      style={{
+        padding: "24px",
+      }}
+    >
+      {title}
+    </div>
+  );
+}
+
 export default function App() {
   return (
     <Routes>
-
-      {/* =========================
-          LOGIN
-          ========================= */}
-
       <Route
         path="/login"
         element={<LoginPage />}
       />
-
-
-      {/* =========================
-          PROTECTED ADMIN AREA
-          ========================= */}
 
       <Route
         element={
@@ -48,11 +65,6 @@ export default function App() {
           </ProtectedRoute>
         }
       >
-
-        {/* =========================
-            ADMIN ROOT
-            ========================= */}
-
         <Route
           path="/admin"
           element={
@@ -63,11 +75,6 @@ export default function App() {
           }
         />
 
-
-        {/* =========================
-            DASHBOARD
-            ========================= */}
-
         <Route
           path="/admin/dashboard"
           element={
@@ -75,23 +82,15 @@ export default function App() {
           }
         />
 
-
-        {/* =========================
-            STUDENTS
-            ========================= */}
-
+        {/* Students */}
         <Route
           path="/admin/students"
-          element={
-            <StudentsPage />
-          }
+          element={<StudentsPage />}
         />
 
         <Route
           path="/admin/students/new"
-          element={
-            <StudentFormPage />
-          }
+          element={<StudentFormPage />}
         />
 
         <Route
@@ -103,28 +102,18 @@ export default function App() {
 
         <Route
           path="/admin/students/:id/edit"
-          element={
-            <StudentFormPage />
-          }
+          element={<StudentFormPage />}
         />
 
-
-        {/* =========================
-            TEACHERS
-            ========================= */}
-
+        {/* Teachers */}
         <Route
           path="/admin/teachers"
-          element={
-            <TeachersPage />
-          }
+          element={<TeachersPage />}
         />
 
         <Route
           path="/admin/teachers/new"
-          element={
-            <TeacherFormPage />
-          }
+          element={<TeacherFormPage />}
         />
 
         <Route
@@ -136,37 +125,85 @@ export default function App() {
 
         <Route
           path="/admin/teachers/:id/edit"
-          element={
-            <TeacherFormPage />
-          }
+          element={<TeacherFormPage />}
         />
 
-
-        {/* =========================
-            FUTURE MODULES
-            ========================= */}
-
+        {/* Courses */}
         <Route
           path="/admin/courses"
+          element={<CoursesPage />}
+        />
+
+        <Route
+          path="/admin/courses/new"
+          element={<CourseFormPage />}
+        />
+
+        <Route
+          path="/admin/courses/:id"
           element={
-            <PlaceholderPage title="Courses" />
+            <CourseDetailsPage />
           }
         />
 
         <Route
+          path="/admin/courses/:id/edit"
+          element={<CourseFormPage />}
+        />
+
+        {/* Batches */}
+        <Route
           path="/admin/batches"
+          element={<BatchesPage />}
+        />
+
+        <Route
+          path="/admin/batches/new"
+          element={<BatchFormPage />}
+        />
+
+        <Route
+          path="/admin/batches/:id"
           element={
-            <PlaceholderPage title="Batches" />
+            <BatchDetailsPage />
           }
         />
 
+        <Route
+          path="/admin/batches/:id/edit"
+          element={<BatchFormPage />}
+        />
+
+        {/* Enrollments */}
         <Route
           path="/admin/enrollments"
           element={
-            <PlaceholderPage title="Enrollments" />
+            <EnrollmentsPage />
           }
         />
 
+        <Route
+          path="/admin/enrollments/new"
+          element={
+            <EnrollmentFormPage />
+          }
+        />
+
+        <Route
+          path="/admin/enrollments/:id"
+          element={
+            <EnrollmentDetailsPage />
+          }
+        />
+
+        <Route
+          path="/admin/enrollments/:id/edit"
+          element={
+            <EnrollmentFormPage />
+          }
+        />
+
+        {/* Future modules */}
         <Route
           path="/admin/fees"
           element={
@@ -194,28 +231,7 @@ export default function App() {
             <PlaceholderPage title="Notifications" />
           }
         />
-
       </Route>
-
-
-      {/* =========================
-          ROOT
-          ========================= */}
-
-      <Route
-        path="/"
-        element={
-          <Navigate
-            to="/admin/dashboard"
-            replace
-          />
-        }
-      />
-
-
-      {/* =========================
-          UNKNOWN ROUTES
-          ========================= */}
 
       <Route
         path="*"
@@ -226,62 +242,6 @@ export default function App() {
           />
         }
       />
-
     </Routes>
-  );
-}
-
-
-/* =========================
-   PLACEHOLDER PAGE
-   ========================= */
-
-function PlaceholderPage({
-  title,
-}: {
-  title: string;
-}) {
-  return (
-    <Box
-      sx={{
-        width: "100%",
-        maxWidth: "100%",
-      }}
-    >
-
-      <Typography
-        variant="h4"
-        sx={{
-          fontWeight: 700,
-          mb: 1,
-
-          fontSize: {
-            xs: "1.7rem",
-            sm: "2rem",
-            md: "2.125rem",
-          },
-
-          lineHeight: 1.2,
-        }}
-      >
-        {title}
-      </Typography>
-
-      <Typography
-        variant="body1"
-        color="text.secondary"
-        sx={{
-          lineHeight: 1.6,
-          fontSize: {
-            xs: "0.9rem",
-            sm: "1rem",
-          },
-        }}
-      >
-        This module will be implemented in
-        the next step.
-      </Typography>
-
-    </Box>
   );
 }

@@ -1,10 +1,8 @@
-import {
-  useState,
-} from "react";
-
+import { useState } from "react";
 import {
   AppBar,
   Box,
+  Button,
   Divider,
   Drawer,
   IconButton,
@@ -14,6 +12,8 @@ import {
   ListItemText,
   Toolbar,
   Typography,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 
 import MenuIcon from "@mui/icons-material/Menu";
@@ -24,25 +24,31 @@ import MenuBookIcon from "@mui/icons-material/MenuBook";
 import GroupsIcon from "@mui/icons-material/Groups";
 import AssignmentIcon from "@mui/icons-material/Assignment";
 import PaymentsIcon from "@mui/icons-material/Payments";
-import CampaignIcon from "@mui/icons-material/Campaign";
+import QuestionAnswerIcon from "@mui/icons-material/QuestionAnswer";
 import EventAvailableIcon from "@mui/icons-material/EventAvailable";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import LogoutIcon from "@mui/icons-material/Logout";
 
 import {
-  NavLink,
   Outlet,
+  useLocation,
   useNavigate,
 } from "react-router-dom";
 
 import { useAuth } from "../auth/AuthContext";
 
-const drawerWidth = 250;
+const DRAWER_WIDTH = 250;
 
-const menuItems = [
+interface MenuItem {
+  label: string;
+  path: string;
+  icon: React.ReactNode;
+}
+
+const menuItems: MenuItem[] = [
   {
     label: "Dashboard",
-    path: "/admin/dashboard",
+    path: "/admin",
     icon: <DashboardIcon />,
   },
   {
@@ -78,7 +84,7 @@ const menuItems = [
   {
     label: "Enquiries",
     path: "/admin/enquiries",
-    icon: <CampaignIcon />,
+    icon: <QuestionAnswerIcon />,
   },
   {
     label: "Attendance",
@@ -94,11 +100,25 @@ const menuItems = [
 
 export default function AdminLayout() {
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const theme = useTheme();
+
+  const isDesktop = useMediaQuery(
+    theme.breakpoints.up("md")
+  );
+
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   const { logout } = useAuth();
 
-  const [mobileOpen, setMobileOpen] =
-    useState(false);
+  const handleNavigation = (path: string) => {
+    navigate(path);
+
+    if (!isDesktop) {
+      setMobileOpen(false);
+    }
+  };
 
   const handleLogout = () => {
     logout();
@@ -108,124 +128,158 @@ export default function AdminLayout() {
   const drawerContent = (
     <Box
       sx={{
+        width: DRAWER_WIDTH,
         height: "100%",
         display: "flex",
         flexDirection: "column",
+        bgcolor: "background.paper",
       }}
     >
+      {/* Drawer Header */}
       <Box
         sx={{
-          px: 2.5,
-          py: 2.5,
+          minHeight: 64,
+          px: 2,
+          display: "flex",
+          alignItems: "center",
         }}
       >
-        <Typography
-          variant="h6"
-          sx={{
-            fontWeight: 800,
-            letterSpacing: "-0.02em",
-          }}
-        >
-          SunComputer
-        </Typography>
+        <Box>
+          <Typography
+            sx={{
+              fontSize: 17,
+              fontWeight: 800,
+              lineHeight: 1.2,
+            }}
+          >
+            SunComputer
+          </Typography>
 
-        <Typography
-          variant="caption"
-          color="text.secondary"
-          sx={{
-            display: "block",
-            mt: 0.5,
-          }}
-        >
-          Student Management System
-        </Typography>
+          <Typography
+            sx={{
+              fontSize: 11,
+              color: "text.secondary",
+              mt: 0.25,
+            }}
+          >
+            Administration
+          </Typography>
+        </Box>
       </Box>
 
       <Divider />
 
-      <List
+      {/* Navigation */}
+      <Box
         sx={{
-          px: 1,
-          py: 1.5,
           flex: 1,
           overflowY: "auto",
-        }}
-      >
-        {menuItems.map((item) => (
-          <ListItemButton
-            key={item.path}
-            component={NavLink}
-            to={item.path}
-            onClick={() =>
-              setMobileOpen(false)
-            }
-            sx={{
-              mb: 0.5,
-              borderRadius: 1.5,
-
-              "&.active": {
-                backgroundColor:
-                  "action.selected",
-              },
-
-              "&.active .MuiListItemIcon-root":
-                {
-                  color: "primary.main",
-                },
-            }}
-          >
-            <ListItemIcon
-              sx={{
-                minWidth: 42,
-              }}
-            >
-              {item.icon}
-            </ListItemIcon>
-
-            <ListItemText
-              primary={item.label}
-              slotProps={{
-                primary: {
-                  sx: { fontSize: "0.9rem", fontWeight: 500 },
-                },
-              }}
-            />
-          </ListItemButton>
-        ))}
-      </List>
-
-      <Divider />
-
-      <List
-        sx={{
-          px: 1,
+          px: 0.75,
           py: 1,
         }}
       >
-        <ListItemButton
-          onClick={handleLogout}
+        <List
+          disablePadding
           sx={{
-            borderRadius: 1.5,
+            display: "flex",
+            flexDirection: "column",
+            gap: 0.5,
           }}
         >
-          <ListItemIcon
-            sx={{
-              minWidth: 42,
-            }}
-          >
-            <LogoutIcon />
-          </ListItemIcon>
+          {menuItems.map((item) => {
+            const isActive =
+              item.path === "/admin"
+                ? location.pathname === "/admin"
+                : location.pathname.startsWith(item.path);
 
-          <ListItemText
-            primary="Logout"
-            slotProps={{
-              primary: {
-                sx: { fontSize: "0.9rem", fontWeight: 500 },
-              },
-            }}
-          />
-        </ListItemButton>
-      </List>
+            return (
+              <ListItemButton
+                key={item.path}
+                selected={isActive}
+                onClick={() =>
+                  handleNavigation(item.path)
+                }
+                sx={{
+                  minHeight: 40,
+                  px: 1,
+                  borderRadius: 1.5,
+
+                  "&.Mui-selected": {
+                    bgcolor: "action.selected",
+                  },
+
+                  "&.Mui-selected:hover": {
+                    bgcolor: "action.selected",
+                  },
+
+                  "&:hover": {
+                    bgcolor: "action.hover",
+                  },
+                }}
+              >
+                <ListItemIcon
+                  sx={{
+                    minWidth: 32,
+                    color: isActive
+                      ? "primary.main"
+                      : "text.secondary",
+                  }}
+                >
+                  {item.icon}
+                </ListItemIcon>
+
+                <ListItemText
+                  primary={
+                    <Typography
+                      sx={{
+                        fontSize: 13,
+                        fontWeight: isActive
+                          ? 700
+                          : 500,
+                        color: isActive
+                          ? "primary.main"
+                          : "text.primary",
+                      }}
+                    >
+                      {item.label}
+                    </Typography>
+                  }
+                />
+              </ListItemButton>
+            );
+          })}
+        </List>
+      </Box>
+
+      {/* Drawer Logout */}
+      <Box
+        sx={{
+          p: 1,
+          borderTop: "1px solid",
+          borderColor: "divider",
+        }}
+      >
+        <Button
+          fullWidth
+          startIcon={<LogoutIcon />}
+          onClick={handleLogout}
+          sx={{
+            justifyContent: "flex-start",
+            px: 1,
+            minHeight: 40,
+            borderRadius: 1.5,
+            textTransform: "none",
+            color: "text.secondary",
+
+            "&:hover": {
+              bgcolor: "action.hover",
+              color: "error.main",
+            },
+          }}
+        >
+          Logout
+        </Button>
+      </Box>
     </Box>
   );
 
@@ -234,76 +288,124 @@ export default function AdminLayout() {
       sx={{
         display: "flex",
         minHeight: "100vh",
-        backgroundColor: "background.default",
+        width: "100%",
+        bgcolor: "background.default",
       }}
     >
+      {/* =========================================
+          TOP NAVBAR
+          ========================================= */}
       <AppBar
         position="fixed"
-        elevation={0}
+        elevation={1}
         sx={{
-          width: {
-            xs: "100%",
-            md: `calc(100% - ${drawerWidth}px)`,
-          },
-          ml: {
-            md: `${drawerWidth}px`,
-          },
+          zIndex: (theme) =>
+            theme.zIndex.drawer + 1,
+
+          bgcolor: "background.paper",
+          color: "text.primary",
+
           borderBottom: "1px solid",
           borderColor: "divider",
-          backgroundColor:
-            "background.paper",
-          color: "text.primary",
         }}
       >
         <Toolbar
           sx={{
             minHeight: {
-              xs: 64,
-              sm: 70,
+              xs: 56,
+              md: 64,
+            },
+
+            px: {
+              xs: 1.5,
+              sm: 2,
+              md: 3,
             },
           }}
         >
-          <IconButton
-            edge="start"
-            onClick={() =>
-              setMobileOpen(true)
-            }
-            sx={{
-              mr: 2,
-              display: {
-                md: "none",
-              },
-            }}
-          >
-            <MenuIcon />
-          </IconButton>
+          {/* Mobile menu button */}
+          {!isDesktop && (
+            <IconButton
+              edge="start"
+              onClick={() =>
+                setMobileOpen(true)
+              }
+              sx={{
+                mr: 1,
+              }}
+              aria-label="open navigation"
+            >
+              <MenuIcon />
+            </IconButton>
+          )}
 
           <Typography
-            variant="h6"
             sx={{
-              fontWeight: 700,
+              flex: 1,
               fontSize: {
-                xs: "1rem",
-                sm: "1.15rem",
+                xs: 17,
+                sm: 19,
+                md: 20,
               },
+              fontWeight: 800,
             }}
           >
             SunComputer Admin
           </Typography>
+
+          <Button
+            onClick={handleLogout}
+            startIcon={<LogoutIcon />}
+            sx={{
+              display: {
+                xs: "none",
+                sm: "inline-flex",
+              },
+
+              textTransform: "none",
+              fontWeight: 600,
+            }}
+          >
+            Logout
+          </Button>
         </Toolbar>
       </AppBar>
 
-      <Box
-        component="nav"
-        sx={{
-          width: {
-            md: drawerWidth,
-          },
-          flexShrink: {
-            md: 0,
-          },
-        }}
-      >
+      {/* =========================================
+          DESKTOP SIDEBAR
+          ========================================= */}
+      {isDesktop && (
+        <Drawer
+          variant="permanent"
+          open
+          sx={{
+            width: DRAWER_WIDTH,
+            flexShrink: 0,
+
+            "& .MuiDrawer-paper": {
+              width: DRAWER_WIDTH,
+              boxSizing: "border-box",
+
+              borderRight: "1px solid",
+              borderColor: "divider",
+            },
+          }}
+        >
+          {/* Space below fixed navbar */}
+          <Toolbar
+            sx={{
+              minHeight: 64,
+            }}
+          />
+
+          {drawerContent}
+        </Drawer>
+      )}
+
+      {/* =========================================
+          MOBILE SIDEBAR
+          ========================================= */}
+      {!isDesktop && (
         <Drawer
           variant="temporary"
           open={mobileOpen}
@@ -314,62 +416,75 @@ export default function AdminLayout() {
             keepMounted: true,
           }}
           sx={{
-            display: {
-              xs: "block",
-              md: "none",
-            },
             "& .MuiDrawer-paper": {
+              width: DRAWER_WIDTH,
               boxSizing: "border-box",
-              width: drawerWidth,
             },
           }}
         >
           {drawerContent}
         </Drawer>
+      )}
 
-        <Drawer
-          variant="permanent"
-          open
-          sx={{
-            display: {
-              xs: "none",
-              md: "block",
-            },
-            "& .MuiDrawer-paper": {
-              boxSizing: "border-box",
-              width: drawerWidth,
-              borderRight:
-                "1px solid",
-              borderColor:
-                "divider",
-            },
-          }}
-        >
-          {drawerContent}
-        </Drawer>
-      </Box>
-
+      {/* =========================================
+          MAIN CONTENT
+          ========================================= */}
       <Box
         component="main"
         sx={{
           flexGrow: 1,
+
           width: {
             xs: "100%",
-            md: `calc(100% - ${drawerWidth}px)`,
+            md: `calc(100% - ${DRAWER_WIDTH}px)`,
           },
+
           minWidth: 0,
-          p: {
-            xs: 2,
-            sm: 3,
-            md: 4,
-          },
-          pt: {
-            xs: 10,
-            sm: 11,
-          },
+          minHeight: "100vh",
+
+          bgcolor: "background.default",
         }}
       >
-        <Outlet />
+        {/* 
+          IMPORTANT:
+          This Toolbar reserves the height of
+          the fixed AppBar.
+        */}
+        <Toolbar
+          sx={{
+            minHeight: {
+              xs: 56,
+              md: 64,
+            },
+          }}
+        />
+
+        {/* =====================================
+            PAGE CONTENT
+
+            IMPORTANT:
+            Use Outlet because App.tsx uses
+            nested React Router routes.
+            ===================================== */}
+        <Box
+          sx={{
+            width: "100%",
+
+            px: {
+              xs: 1.5,
+              sm: 2,
+              md: 3,
+            },
+
+            py: {
+              xs: 2,
+              sm: 2.5,
+              md: 3,
+            },
+          }}
+        >
+          <Outlet />
+        </Box>
       </Box>
     </Box>
   );
