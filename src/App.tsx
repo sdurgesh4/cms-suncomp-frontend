@@ -53,6 +53,16 @@ import EnquiryDetailsPage from "./pages/admin/EnquiryDetailsPage";
 import FollowUpFormPage from "./pages/admin/FollowUpFormPage";
 import ConvertEnquiryPage from "./pages/admin/ConvertEnquiryPage";
 
+/* Attendance */
+import AttendancePage from "./pages/admin/AttendancePage";
+import AttendanceDashboardPage from "./pages/admin/AttendanceDashboardPage";
+import AttendanceReportPage from "./pages/admin/AttendanceReportPage";
+import AttendanceDailyReportPage from "./pages/admin/AttendanceDailyReportPage";
+
+/* Notifications */
+import NotificationsPage from "./pages/admin/NotificationsPage";
+import NotificationFormPage from "./pages/admin/NotificationFormPage";
+
 interface PlaceholderPageProps {
   title: string;
 }
@@ -100,13 +110,19 @@ function PlaceholderPage({
 export default function App() {
   return (
     <Routes>
-      {/* Public */}
+      {/* =========================
+          PUBLIC
+          ========================= */}
+
       <Route
         path="/login"
         element={<LoginPage />}
       />
 
-      {/* Protected Admin */}
+      {/* =========================
+          PROTECTED ADMIN
+          ========================= */}
+
       <Route
         element={
           <ProtectedRoute>
@@ -114,7 +130,10 @@ export default function App() {
           </ProtectedRoute>
         }
       >
-        {/* Dashboard */}
+        {/* =========================
+            DASHBOARD
+            ========================= */}
+
         <Route
           path="/admin"
           element={
@@ -344,9 +363,28 @@ export default function App() {
         <Route
           path="/admin/attendance"
           element={
-            <PlaceholderPage
-              title="Attendance"
-            />
+            <AttendancePage />
+          }
+        />
+
+        <Route
+          path="/admin/attendance/dashboard"
+          element={
+            <AttendanceDashboardPage />
+          }
+        />
+
+        <Route
+          path="/admin/attendance/report"
+          element={
+            <AttendanceReportPage />
+          }
+        />
+
+        <Route
+          path="/admin/attendance/daily-report"
+          element={
+            <AttendanceDailyReportPage />
           }
         />
 
@@ -357,13 +395,21 @@ export default function App() {
         <Route
           path="/admin/notifications"
           element={
-            <PlaceholderPage
-              title="Notifications"
-            />
+            <NotificationsPage />
           }
         />
 
-        {/* Admin fallback */}
+        <Route
+          path="/admin/notifications/new"
+          element={
+            <NotificationFormPage />
+          }
+        />
+
+        {/* =========================
+            ADMIN FALLBACK
+            ========================= */}
+
         <Route
           path="/admin/*"
           element={
@@ -375,7 +421,10 @@ export default function App() {
         />
       </Route>
 
-      {/* Root */}
+      {/* =========================
+          ROOT
+          ========================= */}
+
       <Route
         path="/"
         element={
@@ -386,7 +435,10 @@ export default function App() {
         }
       />
 
-      {/* Global fallback */}
+      {/* =========================
+          GLOBAL FALLBACK
+          ========================= */}
+
       <Route
         path="*"
         element={
