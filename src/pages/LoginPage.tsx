@@ -47,7 +47,10 @@ export default function LoginPage() {
     try {
       setServerError(null);
 
-      await login(data.username, data.password);
+      await login({
+        username: data.username,
+        password: data.password,
+      });
 
       navigate("/admin/dashboard", {
         replace: true,

@@ -40,10 +40,6 @@ import {
   userApi,
 } from "../../api/userApi";
 
-import type {
-  TeacherStatus,
-} from "../../types/teacher";
-
 import {
   createTeacherSchema,
   updateTeacherSchema,

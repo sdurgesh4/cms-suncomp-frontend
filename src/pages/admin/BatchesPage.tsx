@@ -422,14 +422,7 @@ export default function BatchesPage() {
 
       {/* Table */}
       {filteredBatches.length === 0 ? (
-        <EmptyState
-          title="No batches found"
-          description={
-            search || status !== "ALL"
-              ? "Try changing your search or filters."
-              : "Create your first batch to get started."
-          }
-        />
+        <EmptyState message="No batches found. Try changing your search or filters." />
       ) : (
         <Box
           sx={{
@@ -796,7 +789,7 @@ export default function BatchesPage() {
         onConfirm={() =>
           void handleCancel()
         }
-        onClose={() =>
+        onCancel={() =>
           setCancelId(null)
         }
       />

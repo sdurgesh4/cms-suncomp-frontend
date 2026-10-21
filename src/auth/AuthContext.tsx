@@ -1,133 +1,154 @@
+
 import {
   createContext,
+  useCallback,
   useContext,
+  useEffect,
   useMemo,
   useState,
   type PropsWithChildren,
 } from "react";
 
-import {
-  login as loginApi,
-  type LoginResponse,
-} from "../api/authApi";
-
+import { authApi } from "../api/authApi";
+import type {
+  LoginRequest,
+  MeResponse,
+} from "../types/auth";
 import {
   getToken,
-  removeToken,
   setToken,
+  clearToken,
 } from "./authStorage";
 
 interface AuthContextValue {
-  token: string | null;
-  username: string | null;
-  roles: string[];
-  isAuthenticated: boolean;
-
-  login: (
-    username: string,
-    password: string,
-  ) => Promise<LoginResponse>;
-
+  user: MeResponse | null;
+  loading: boolean;
+  authenticated: boolean;
+  login: (payload: LoginRequest) => Promise<MeResponse>;
+  refreshMe: () => Promise<void>;
   logout: () => void;
+  hasRole: (...roles: string[]) => boolean;
 }
 
-const AuthContext =
-  createContext<AuthContextValue | undefined>(
-    undefined,
-  );
+const AuthContext = createContext<AuthContextValue | undefined>(
+  undefined,
+);
 
-export function AuthProvider({
-  children,
-}: PropsWithChildren) {
-  const [token, setTokenState] =
-    useState<string | null>(() => getToken());
+function normalizeRole(role: string): string {
+  return role.replace(/^ROLE_/, "").toUpperCase();
+}
 
-  const [username, setUsername] =
-    useState<string | null>(() =>
-      localStorage.getItem(
-        "suncomputer_username",
-      ),
-    );
+function normalizeUser(user: MeResponse): MeResponse {
+  return {
+    ...user,
+    roles: (user.roles ?? []).map(normalizeRole),
+  };
+}
 
-  const [roles, setRoles] =
-    useState<string[]>(() => {
-      const stored =
-        localStorage.getItem(
-          "suncomputer_roles",
-        );
+export function AuthProvider({ children }: PropsWithChildren) {
+  const [user, setUser] = useState<MeResponse | null>(null);
+  const [loading, setLoading] = useState(true);
 
-      if (!stored) {
-        return [];
+  const refreshMe = useCallback(async (): Promise<void> => {
+    if (!getToken()) {
+      setUser(null);
+      return;
+    }
+
+    try {
+      const currentUser = await authApi.me();
+      setUser(normalizeUser(currentUser));
+    } catch (error) {
+      clearToken();
+      setUser(null);
+      throw error;
+    }
+  }, []);
+
+  useEffect(() => {
+    let mounted = true;
+
+    async function initialize(): Promise<void> {
+      try {
+        if (getToken()) {
+          const currentUser = await authApi.me();
+
+          if (mounted) {
+            setUser(normalizeUser(currentUser));
+          }
+        }
+      } catch {
+        clearToken();
+
+        if (mounted) {
+          setUser(null);
+        }
+      } finally {
+        if (mounted) {
+          setLoading(false);
+        }
       }
+    }
+
+    void initialize();
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  const login = useCallback(
+    async (payload: LoginRequest): Promise<MeResponse> => {
+      const response = await authApi.login(payload);
+
+      // Save the JWT before requesting the current user's profile.
+      setToken(response.accessToken);
 
       try {
-        return JSON.parse(stored);
-      } catch {
-        return [];
+        const currentUser = await authApi.me();
+        const normalizedUser = normalizeUser(currentUser);
+
+        setUser(normalizedUser);
+
+        // Return the user so LoginPage can redirect immediately
+        // using the correct role without waiting for state updates.
+        return normalizedUser;
+      } catch (error) {
+        clearToken();
+        setUser(null);
+        throw error;
       }
-    });
+    },
+    [],
+  );
 
-  const login = async (
-    usernameValue: string,
-    password: string,
-  ): Promise<LoginResponse> => {
-    const response = await loginApi({
-      username: usernameValue,
-      password,
-    });
+  const logout = useCallback((): void => {
+    clearToken();
+    setUser(null);
+  }, []);
 
-    console.log(
-      "Backend login successful:",
-      response,
-    );
+  const hasRole = useCallback(
+    (...roles: string[]): boolean => {
+      const currentRoles = user?.roles.map(normalizeRole) ?? [];
 
-    // Backend returns accessToken
-    setToken(response.accessToken);
-    setTokenState(response.accessToken);
-
-    setUsername(response.username);
-
-    localStorage.setItem(
-      "suncomputer_username",
-      response.username,
-    );
-
-    setRoles(response.roles);
-
-    localStorage.setItem(
-      "suncomputer_roles",
-      JSON.stringify(response.roles),
-    );
-
-    return response;
-  };
-
-  const logout = () => {
-    removeToken();
-
-    localStorage.removeItem(
-      "suncomputer_username",
-    );
-
-    localStorage.removeItem(
-      "suncomputer_roles",
-    );
-
-    setTokenState(null);
-    setUsername(null);
-    setRoles([]);
-  };
+      return roles.some((role) =>
+        currentRoles.includes(normalizeRole(role)),
+      );
+    },
+    [user],
+  );
 
   const value = useMemo<AuthContextValue>(
     () => ({
-      token,
-      username,
-      roles,
-      isAuthenticated: !!token,
+      user,
+      loading,
+      authenticated: Boolean(user && getToken()),
       login,
+      refreshMe,
       logout,
+      hasRole,
     }),
-    [token, username, roles],
+    [user, loading, login, refreshMe, logout, hasRole],
   );
 
   return (
@@ -141,9 +162,7 @@ export function useAuth(): AuthContextValue {
   const context = useContext(AuthContext);
 
   if (!context) {
-    throw new Error(
-      "useAuth must be used inside AuthProvider",
-    );
+    throw new Error("useAuth must be used inside AuthProvider");
   }
 
   return context;

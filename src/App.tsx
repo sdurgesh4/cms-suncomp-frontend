@@ -1,117 +1,99 @@
+
 import {
+  Link,
   Navigate,
   Route,
   Routes,
 } from "react-router-dom";
 
-import {
-  Box,
-  Typography,
-} from "@mui/material";
+import { Button } from "@mui/material";
 
+import { AuthProvider } from "./auth/AuthContext";
 import ProtectedRoute from "./auth/ProtectedRoute";
+
 import AdminLayout from "./layouts/AdminLayout";
+import AuthFormLayout from "./pages/auth/AuthFormLayout";
 
-import LoginPage from "./pages/LoginPage";
+// Authentication pages
+import LoginPage from "./pages/auth/LoginPage";
+import ForgotPasswordPage from "./pages/auth/ForgotPasswordPage";
+import ResetPasswordPage from "./pages/auth/ResetPasswordPage";
+import ChangePasswordPage from "./pages/auth/ChangePasswordPage";
+import MePage from "./pages/auth/MePage";
 
+// Dashboard
 import AdminDashboardPage from "./pages/admin/AdminDashboardPage";
 
-/* Students */
+// Students
 import StudentsPage from "./pages/admin/StudentsPage";
 import StudentFormPage from "./pages/admin/StudentFormPage";
 import StudentDetailsPage from "./pages/admin/StudentDetailsPage";
 
-/* Teachers */
+// Teachers
 import TeachersPage from "./pages/admin/TeachersPage";
 import TeacherFormPage from "./pages/admin/TeacherFormPage";
 import TeacherDetailsPage from "./pages/admin/TeacherDetailsPage";
 
-/* Courses */
+// Courses
 import CoursesPage from "./pages/admin/CoursesPage";
 import CourseFormPage from "./pages/admin/CourseFormPage";
 import CourseDetailsPage from "./pages/admin/CourseDetailsPage";
 
-/* Batches */
+// Batches
 import BatchesPage from "./pages/admin/BatchesPage";
 import BatchFormPage from "./pages/admin/BatchFormPage";
 import BatchDetailsPage from "./pages/admin/BatchDetailsPage";
 
-/* Enrollments */
+// Enrollments
 import EnrollmentsPage from "./pages/admin/EnrollmentsPage";
 import EnrollmentFormPage from "./pages/admin/EnrollmentFormPage";
 import EnrollmentDetailsPage from "./pages/admin/EnrollmentDetailsPage";
 
-/* Fees */
+// Fees
 import FeesPage from "./pages/admin/FeesPage";
 import PaymentFormPage from "./pages/admin/PaymentFormPage";
 import InstallmentFormPage from "./pages/admin/InstallmentFormPage";
 
-/* Enquiries */
+// Enquiries
 import EnquiriesPage from "./pages/admin/EnquiriesPage";
 import EnquiryFormPage from "./pages/admin/EnquiryFormPage";
 import EnquiryDetailsPage from "./pages/admin/EnquiryDetailsPage";
 import FollowUpFormPage from "./pages/admin/FollowUpFormPage";
 import ConvertEnquiryPage from "./pages/admin/ConvertEnquiryPage";
 
-/* Attendance */
+// Attendance
 import AttendancePage from "./pages/admin/AttendancePage";
 import AttendanceDashboardPage from "./pages/admin/AttendanceDashboardPage";
 import AttendanceReportPage from "./pages/admin/AttendanceReportPage";
 import AttendanceDailyReportPage from "./pages/admin/AttendanceDailyReportPage";
 
-/* Notifications */
+// Notifications
 import NotificationsPage from "./pages/admin/NotificationsPage";
 import NotificationFormPage from "./pages/admin/NotificationFormPage";
 
-interface PlaceholderPageProps {
-  title: string;
-}
-
-function PlaceholderPage({
-  title,
-}: PlaceholderPageProps) {
+function UnauthorizedPage() {
   return (
-    <Box
-      sx={{
-        width: "100%",
-        minHeight: "60vh",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        textAlign: "center",
-        px: 2,
-      }}
+    <AuthFormLayout
+      title="Access denied"
+      subtitle="Your account does not have permission to access this page."
     >
-      <Typography
-        variant="h4"
-        component="h1"
-        sx={{
-          fontWeight: 700,
-          mb: 1,
-        }}
+      <Button
+        component={Link}
+        to="/me"
+        variant="contained"
+        fullWidth
       >
-        {title}
-      </Typography>
-
-      <Typography
-        variant="body1"
-        color="text.secondary"
-        sx={{
-          maxWidth: 600,
-        }}
-      >
-        This module is coming next.
-      </Typography>
-    </Box>
+        Go to my profile
+      </Button>
+    </AuthFormLayout>
   );
 }
 
-export default function App() {
+function AppRoutes() {
   return (
     <Routes>
       {/* =========================
-          PUBLIC
+          PUBLIC AUTHENTICATION
           ========================= */}
 
       <Route
@@ -119,8 +101,38 @@ export default function App() {
         element={<LoginPage />}
       />
 
+      <Route
+        path="/forgot-password"
+        element={<ForgotPasswordPage />}
+      />
+
+      <Route
+        path="/reset-password"
+        element={<ResetPasswordPage />}
+      />
+
+      <Route
+        path="/unauthorized"
+        element={<UnauthorizedPage />}
+      />
+
       {/* =========================
-          PROTECTED ADMIN
+          AUTHENTICATED USER PROFILE
+          ========================= */}
+
+      <Route
+        path="/me"
+        element={
+          <ProtectedRoute>
+            <MePage />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* =========================
+          PROTECTED ADMIN LAYOUT
+          AdminLayout must render <Outlet />
+          for these nested routes.
           ========================= */}
 
       <Route
@@ -130,9 +142,17 @@ export default function App() {
           </ProtectedRoute>
         }
       >
-        {/* =========================
-            DASHBOARD
-            ========================= */}
+        {/* Dashboard */}
+
+        <Route
+          path="/"
+          element={
+            <Navigate
+              to="/admin/dashboard"
+              replace
+            />
+          }
+        />
 
         <Route
           path="/admin"
@@ -146,14 +166,10 @@ export default function App() {
 
         <Route
           path="/admin/dashboard"
-          element={
-            <AdminDashboardPage />
-          }
+          element={<AdminDashboardPage />}
         />
 
-        {/* =========================
-            STUDENTS
-            ========================= */}
+        {/* Students */}
 
         <Route
           path="/admin/students"
@@ -172,14 +188,10 @@ export default function App() {
 
         <Route
           path="/admin/students/:id"
-          element={
-            <StudentDetailsPage />
-          }
+          element={<StudentDetailsPage />}
         />
 
-        {/* =========================
-            TEACHERS
-            ========================= */}
+        {/* Teachers */}
 
         <Route
           path="/admin/teachers"
@@ -198,14 +210,10 @@ export default function App() {
 
         <Route
           path="/admin/teachers/:id"
-          element={
-            <TeacherDetailsPage />
-          }
+          element={<TeacherDetailsPage />}
         />
 
-        {/* =========================
-            COURSES
-            ========================= */}
+        {/* Courses */}
 
         <Route
           path="/admin/courses"
@@ -224,14 +232,10 @@ export default function App() {
 
         <Route
           path="/admin/courses/:id"
-          element={
-            <CourseDetailsPage />
-          }
+          element={<CourseDetailsPage />}
         />
 
-        {/* =========================
-            BATCHES
-            ========================= */}
+        {/* Batches */}
 
         <Route
           path="/admin/batches"
@@ -250,46 +254,32 @@ export default function App() {
 
         <Route
           path="/admin/batches/:id"
-          element={
-            <BatchDetailsPage />
-          }
+          element={<BatchDetailsPage />}
         />
 
-        {/* =========================
-            ENROLLMENTS
-            ========================= */}
+        {/* Enrollments */}
 
         <Route
           path="/admin/enrollments"
-          element={
-            <EnrollmentsPage />
-          }
+          element={<EnrollmentsPage />}
         />
 
         <Route
           path="/admin/enrollments/new"
-          element={
-            <EnrollmentFormPage />
-          }
+          element={<EnrollmentFormPage />}
         />
 
         <Route
           path="/admin/enrollments/:id/edit"
-          element={
-            <EnrollmentFormPage />
-          }
+          element={<EnrollmentFormPage />}
         />
 
         <Route
           path="/admin/enrollments/:id"
-          element={
-            <EnrollmentDetailsPage />
-          }
+          element={<EnrollmentDetailsPage />}
         />
 
-        {/* =========================
-            FEES
-            ========================= */}
+        {/* Fees and payments */}
 
         <Route
           path="/admin/fees"
@@ -298,117 +288,88 @@ export default function App() {
 
         <Route
           path="/admin/fees/payment/new"
-          element={
-            <PaymentFormPage />
-          }
+          element={<PaymentFormPage />}
         />
 
         <Route
           path="/admin/fees/installment/new"
-          element={
-            <InstallmentFormPage />
-          }
+          element={<InstallmentFormPage />}
         />
 
-        {/* =========================
-            ENQUIRIES
-            ========================= */}
+        {/* Enquiries */}
 
         <Route
           path="/admin/enquiries"
-          element={
-            <EnquiriesPage />
-          }
+          element={<EnquiriesPage />}
         />
 
         <Route
           path="/admin/enquiries/new"
-          element={
-            <EnquiryFormPage />
-          }
+          element={<EnquiryFormPage />}
         />
 
         <Route
           path="/admin/enquiries/:id/edit"
-          element={
-            <EnquiryFormPage />
-          }
+          element={<EnquiryFormPage />}
         />
 
         <Route
           path="/admin/enquiries/:id"
-          element={
-            <EnquiryDetailsPage />
-          }
+          element={<EnquiryDetailsPage />}
         />
 
         <Route
           path="/admin/enquiries/:id/follow-up/new"
-          element={
-            <FollowUpFormPage />
-          }
+          element={<FollowUpFormPage />}
         />
 
         <Route
           path="/admin/enquiries/:id/convert"
-          element={
-            <ConvertEnquiryPage />
-          }
+          element={<ConvertEnquiryPage />}
         />
 
-        {/* =========================
-            ATTENDANCE
-            ========================= */}
+        {/* Attendance */}
 
         <Route
           path="/admin/attendance"
-          element={
-            <AttendancePage />
-          }
+          element={<AttendancePage />}
         />
 
         <Route
           path="/admin/attendance/dashboard"
-          element={
-            <AttendanceDashboardPage />
-          }
+          element={<AttendanceDashboardPage />}
         />
 
         <Route
           path="/admin/attendance/report"
-          element={
-            <AttendanceReportPage />
-          }
+          element={<AttendanceReportPage />}
         />
 
         <Route
           path="/admin/attendance/daily-report"
-          element={
-            <AttendanceDailyReportPage />
-          }
+          element={<AttendanceDailyReportPage />}
         />
 
-        {/* =========================
-            NOTIFICATIONS
-            ========================= */}
+        {/* Notifications */}
 
         <Route
           path="/admin/notifications"
-          element={
-            <NotificationsPage />
-          }
+          element={<NotificationsPage />}
         />
 
         <Route
           path="/admin/notifications/new"
-          element={
-            <NotificationFormPage />
-          }
+          element={<NotificationFormPage />}
         />
 
-        {/* =========================
-            ADMIN FALLBACK
-            ========================= */}
+        {/* Change password */}
+
+        <Route
+          path="/admin/change-password"
+          element={<ChangePasswordPage />}
+        />
+
+        {/* Unknown admin route */}
 
         <Route
           path="/admin/*"
@@ -420,20 +381,6 @@ export default function App() {
           }
         />
       </Route>
-
-      {/* =========================
-          ROOT
-          ========================= */}
-
-      <Route
-        path="/"
-        element={
-          <Navigate
-            to="/admin/dashboard"
-            replace
-          />
-        }
-      />
 
       {/* =========================
           GLOBAL FALLBACK
@@ -449,5 +396,13 @@ export default function App() {
         }
       />
     </Routes>
+  );
+}
+
+export default function App() {
+  return (
+    <AuthProvider>
+      <AppRoutes />
+    </AuthProvider>
   );
 }

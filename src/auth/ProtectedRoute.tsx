@@ -1,13 +1,47 @@
 import type { PropsWithChildren } from "react";
-import { Navigate, Outlet } from "react-router-dom";
+import { Box, CircularProgress } from "@mui/material";
+import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "./AuthContext";
 
-export default function ProtectedRoute({ children }: PropsWithChildren) {
-  const { isAuthenticated } = useAuth();
+interface Props extends PropsWithChildren {
+  allowedRoles?: string[];
+}
 
-  if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
+export default function ProtectedRoute({
+  children,
+  allowedRoles,
+}: Props) {
+  const { authenticated, loading, hasRole } = useAuth();
+  const location = useLocation();
+
+  if (loading) {
+    return (
+      <Box
+        sx={{
+          minHeight: "60vh",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <CircularProgress />
+      </Box>
+    );
   }
 
-  return children ?? <Outlet />;
+  if (!authenticated) {
+    return (
+      <Navigate
+        to="/login"
+        replace
+        state={{ from: location }}
+      />
+    );
+  }
+
+  if (allowedRoles?.length && !hasRole(...allowedRoles)) {
+    return <Navigate to="/unauthorized" replace />;
+  }
+
+  return <>{children}</>;
 }

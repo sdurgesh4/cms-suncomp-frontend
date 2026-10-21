@@ -624,14 +624,14 @@ export default function EnrollmentDetailsPage() {
       <ConfirmDialog
         open={cancelOpen}
         title="Cancel Enrollment"
-        description={`Are you sure you want to cancel the enrollment of ${enrollment.studentName} in ${enrollment.batchCode}?`}
+        message={`Are you sure you want to cancel the enrollment of ${enrollment.studentName} in ${enrollment.batchCode}?`}
         confirmText="Cancel Enrollment"
         cancelText="Keep Enrollment"
         loading={cancelling}
         onConfirm={() =>
           void handleCancel()
         }
-        onClose={() => {
+        onCancel={() => {
           if (!cancelling) {
             setCancelOpen(false);
           }

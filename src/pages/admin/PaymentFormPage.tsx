@@ -20,7 +20,6 @@ import {
 } from "@mui/material";
 
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import PaymentsIcon from "@mui/icons-material/Payments";
 import SaveIcon from "@mui/icons-material/Save";
 
 import { enrollmentApi } from "../../api/enrollmentApi";

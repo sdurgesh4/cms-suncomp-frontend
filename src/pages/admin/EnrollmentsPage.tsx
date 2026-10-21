@@ -34,7 +34,6 @@ import type {
 import { useDebounce } from "../../hooks/useDebounce";
 import ConfirmDialog from "../../components/ConfirmDialog";
 import EmptyState from "../../components/EmptyState";
-import ErrorState from "../../components/ErrorState";
 
 const statusOptions: Array<
   "ALL" | EnrollmentStatus
@@ -406,14 +405,7 @@ export default function EnrollmentsPage() {
           </Typography>
         </Box>
       ) : filteredEnrollments.length === 0 ? (
-        <EmptyState
-          title="No enrollments found"
-          description={
-            search || status !== "ALL"
-              ? "Try changing your search or status filter."
-              : "Create your first enrollment to get started."
-          }
-        />
+        <EmptyState message="No enrollments found. Try changing your search or filters." />
       ) : (
         <Box
           sx={{
@@ -654,7 +646,7 @@ export default function EnrollmentsPage() {
       <ConfirmDialog
         open={Boolean(cancelTarget)}
         title="Cancel Enrollment"
-        description={
+        message={
           cancelTarget
             ? `Are you sure you want to cancel the enrollment of ${cancelTarget.studentName} in ${cancelTarget.batchCode}?`
             : ""
@@ -665,7 +657,7 @@ export default function EnrollmentsPage() {
         onConfirm={() =>
           void handleCancel()
         }
-        onClose={() => {
+        onCancel={() => {
           if (!cancelling) {
             setCancelTarget(null);
           }

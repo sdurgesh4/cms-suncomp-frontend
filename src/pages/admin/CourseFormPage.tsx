@@ -16,11 +16,13 @@ import {
 import { ArrowBack, Save } from "@mui/icons-material";
 import { useNavigate, useParams } from "react-router-dom";
 
-import {
-  courseApi,
-  type CreateCourseRequest,
-  type UpdateCourseRequest,
-} from "../../api/courseApi";
+import { courseApi } from "../../api/courseApi";
+
+import type {
+  Course,
+  CreateCourseRequest,
+  UpdateCourseRequest,
+} from "../../types/course";
 
 import {
   createCourseSchema,
@@ -28,12 +30,6 @@ import {
   type CreateCourseFormValues,
   type UpdateCourseFormValues,
 } from "../../validation/courseSchema";
-
-import type {
-  CourseLevel,
-  DurationUnit,
-  Course,
-} from "../../types/course";
 
 const CourseFormPage = () => {
   const navigate = useNavigate();
@@ -48,7 +44,6 @@ const CourseFormPage = () => {
   const {
     control: createControl,
     handleSubmit: handleCreateSubmit,
-    reset: resetCreate,
     formState: { errors: createErrors },
   } = useForm<CreateCourseFormValues>({
     resolver: zodResolver(createCourseSchema),

@@ -273,24 +273,6 @@ export default function AttendancePage() {
     [records],
   );
 
-  const lateCount = useMemo(
-    () =>
-      records.filter(
-        (record) =>
-          record.status === "LATE",
-      ).length,
-    [records],
-  );
-
-  const leaveCount = useMemo(
-    () =>
-      records.filter(
-        (record) =>
-          record.status === "LEAVE",
-      ).length,
-    [records],
-  );
-
   const handleSave = async () => {
     if (batchId === "") {
       setError("Please select a batch.");

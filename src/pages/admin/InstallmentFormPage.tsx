@@ -19,7 +19,6 @@ import {
   Typography,
 } from "@mui/material";
 
-import AddIcon from "@mui/icons-material/Add";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import SaveIcon from "@mui/icons-material/Save";
 
@@ -49,26 +48,6 @@ function formatCurrency(
     currency: "INR",
     maximumFractionDigits: 2,
   }).format(amount);
-}
-
-function formatDate(
-  value?: string | null,
-): string {
-  if (!value) {
-    return "-";
-  }
-
-  const date = new Date(value);
-
-  if (Number.isNaN(date.getTime())) {
-    return value;
-  }
-
-  return date.toLocaleDateString("en-IN", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-  });
 }
 
 export default function InstallmentFormPage() {

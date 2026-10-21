@@ -1,3 +1,4 @@
+
 const TOKEN_KEY = "suncomputer_token";
 
 export function getToken(): string | null {
@@ -11,3 +12,6 @@ export function setToken(token: string): void {
 export function removeToken(): void {
   localStorage.removeItem(TOKEN_KEY);
 }
+
+// Keep this alias for files that already use clearToken().
+export const clearToken = removeToken;
