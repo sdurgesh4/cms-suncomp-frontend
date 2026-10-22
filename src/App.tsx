@@ -76,6 +76,13 @@ import AttendanceDailyReportPage from "./pages/admin/AttendanceDailyReportPage";
 // Notifications
 import NotificationsPage from "./pages/admin/NotificationsPage";
 import NotificationFormPage from "./pages/admin/NotificationFormPage";
+import TeacherLayout from "./layouts/TeacherLayout";
+import TeacherDashboardPage from "./pages/teacher/TeacherDashboardPage";
+import TeacherClassesPage from "./pages/teacher/TeacherClassesPage";
+import TeacherAttendancePage from "./pages/teacher/TeacherAttendancePage";
+import TeacherReportsPage from "./pages/teacher/TeacherReportsPage";
+import TeacherStudentsPage from "./pages/teacher/TeacherStudentsPage";
+import TeacherProfilePage from "./pages/teacher/TeacherProfilePage";
 
 function UnauthorizedPage() {
   return (
@@ -95,10 +102,25 @@ function UnauthorizedPage() {
   );
 }
 
+
 function HomeRedirect() {
   const { hasRole } = useAuth();
-  return <Navigate to={hasRole("STUDENT") ? "/student/dashboard" : "/admin/dashboard"} replace />;
+
+  if (hasRole("ADMIN")) {
+    return <Navigate to="/admin/dashboard" replace />;
+  }
+
+  if (hasRole("TEACHER")) {
+    return <Navigate to="/teacher/dashboard" replace />;
+  }
+
+  if (hasRole("STUDENT")) {
+    return <Navigate to="/student/dashboard" replace />;
+  }
+
+  return <Navigate to="/login" replace />;
 }
+
 
 function AppRoutes() {
   return (
@@ -148,7 +170,7 @@ function AppRoutes() {
 
       <Route
         element={
-          <ProtectedRoute>
+          <ProtectedRoute allowedRoles={["ADMIN"]}>
             <AdminLayout />
           </ProtectedRoute>
         }
@@ -407,9 +429,36 @@ function AppRoutes() {
         <Route path="*" element={<Navigate to="/student/dashboard" replace />} />
       </Route>
 
+      <Route
+        path="/teacher"
+        element={
+          <ProtectedRoute allowedRoles={["TEACHER"]}>
+            <TeacherLayout />
+          </ProtectedRoute>
+        }
+      >
+        <Route
+          index
+          element={<Navigate to="/teacher/dashboard" replace />}
+        />
+        <Route path="dashboard" element={<TeacherDashboardPage />} />
+        {/* Sidebar uses My Classes, so this is the canonical classes route. */}
+        <Route path="classes" element={<TeacherClassesPage />} />
+        <Route path="courses" element={<Navigate to="/teacher/classes" replace />} />
+        <Route path="batches" element={<Navigate to="/teacher/classes" replace />} />
+        <Route path="students" element={<TeacherStudentsPage />} />
+        <Route path="attendance" element={<TeacherAttendancePage />} />
+        <Route path="reports" element={<TeacherReportsPage />} />
+        <Route path="notifications" element={<StudentNotificationsPage />} />
+        <Route path="profile" element={<TeacherProfilePage />} />
+        <Route path="change-password" element={<ChangePasswordPage />} />
+        <Route path="*" element={<Navigate to="/teacher/dashboard" replace />} />
+      </Route>
+      
       {/* =========================
           GLOBAL FALLBACK
           ========================= */}
+
 
       <Route path="*" element={<HomeRedirect />} />
     </Routes>

@@ -53,7 +53,6 @@ export default function LoginPage() {
   const location = useLocation();
 
   const locationState = location.state as LoginLocationState | null;
-  const redirectTo = locationState?.from?.pathname;
 
   const [username, setUsername] = useState(
     () => localStorage.getItem("suncomputer_username") ?? "",
@@ -99,10 +98,9 @@ export default function LoginPage() {
       }
 
       // Redirect using the returned user's roles.
-      const destination =
-        redirectTo || roleHome(currentUser.roles);
-
-      navigate(destination, { replace: true });
+      // Always route to the landing page for the authenticated role.
+      // Do not let a previously requested URL bypass role-based routing.
+      navigate(roleHome(currentUser.roles), { replace: true });
     } catch {
       setError(
         "Login failed. Please check your username and password.",
