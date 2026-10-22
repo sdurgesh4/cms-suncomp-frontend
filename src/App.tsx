@@ -10,8 +10,14 @@ import { Button } from "@mui/material";
 
 import { AuthProvider } from "./auth/AuthContext";
 import ProtectedRoute from "./auth/ProtectedRoute";
+import { useAuth } from "./auth/AuthContext";
 
 import AdminLayout from "./layouts/AdminLayout";
+import StudentLayout from "./layouts/StudentLayout";
+import StudentDashboardPage from "./pages/student/StudentDashboardPage";
+import StudentProfilePage from "./pages/student/StudentProfilePage";
+import StudentSectionPage from "./pages/student/StudentSectionPage";
+import StudentNotificationsPage from "./pages/student/StudentNotificationsPage";
 import AuthFormLayout from "./pages/auth/AuthFormLayout";
 
 // Authentication pages
@@ -89,6 +95,11 @@ function UnauthorizedPage() {
   );
 }
 
+function HomeRedirect() {
+  const { hasRole } = useAuth();
+  return <Navigate to={hasRole("STUDENT") ? "/student/dashboard" : "/admin/dashboard"} replace />;
+}
+
 function AppRoutes() {
   return (
     <Routes>
@@ -144,15 +155,7 @@ function AppRoutes() {
       >
         {/* Dashboard */}
 
-        <Route
-          path="/"
-          element={
-            <Navigate
-              to="/admin/dashboard"
-              replace
-            />
-          }
-        />
+        <Route path="/" element={<HomeRedirect />} />
 
         <Route
           path="/admin"
@@ -383,18 +386,32 @@ function AppRoutes() {
       </Route>
 
       {/* =========================
+          PROTECTED STUDENT PORTAL
+          ========================= */}
+      <Route
+        path="/student"
+        element={
+          <ProtectedRoute allowedRoles={["STUDENT"]}>
+            <StudentLayout />
+          </ProtectedRoute>
+        }
+      >
+        <Route index element={<Navigate to="/student/dashboard" replace />} />
+        <Route path="dashboard" element={<StudentDashboardPage />} />
+        <Route path="profile" element={<StudentProfilePage />} />
+        <Route path="courses" element={<StudentSectionPage section="courses" />} />
+        <Route path="attendance" element={<StudentSectionPage section="attendance" />} />
+        <Route path="fees" element={<StudentSectionPage section="fees" />} />
+        <Route path="notifications" element={<StudentNotificationsPage />} />
+        <Route path="change-password" element={<ChangePasswordPage />} />
+        <Route path="*" element={<Navigate to="/student/dashboard" replace />} />
+      </Route>
+
+      {/* =========================
           GLOBAL FALLBACK
           ========================= */}
 
-      <Route
-        path="*"
-        element={
-          <Navigate
-            to="/admin/dashboard"
-            replace
-          />
-        }
-      />
+      <Route path="*" element={<HomeRedirect />} />
     </Routes>
   );
 }
