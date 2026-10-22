@@ -68,7 +68,7 @@ export default function LoginPage() {
   if (authenticated && user) {
     return (
       <Navigate
-        to={redirectTo || roleHome(user.roles)}
+        to={roleHome(user.roles)}
         replace
       />
     );
