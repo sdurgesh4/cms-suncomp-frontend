@@ -41,6 +41,8 @@ import {
 } from "react-router-dom";
 
 import { studentApi } from "../../api/studentApi";
+import { idCodeApi } from "../../api/idCodeApi";
+
 import { userApi } from "../../api/userApi";
 
 import type {
@@ -146,6 +148,13 @@ export default function StudentFormPage() {
       admissionDate: "",
     },
   });
+
+  useEffect(() => {
+    if (isEdit) return;
+    idCodeApi.preview("STUDENT")
+      .then((code) => createForm.setValue("studentCode", code, { shouldValidate: true }))
+      .catch(() => setError("Could not preview the next ID. It will still be generated securely when saved."));
+  }, [isEdit, createForm]);
 
   const updateForm = useForm<UpdateStudentForm>({
     resolver: zodResolver(updateStudentSchema),
@@ -581,6 +590,7 @@ export default function StudentFormPage() {
                 label="Student Code"
                 name="studentCode"
                 control={createForm.control}
+                disabled
                 error={
                   !!createForm.formState
                     .errors.studentCode

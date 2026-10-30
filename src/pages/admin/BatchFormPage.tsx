@@ -48,6 +48,7 @@ import {
 } from "../../api/batchApi";
 
 import { courseApi } from "../../api/courseApi";
+import { idCodeApi } from "../../api/idCodeApi";
 import { teacherApi } from "../../api/teacherApi";
 
 import type { Course } from "../../types/course";
@@ -121,6 +122,7 @@ export default function BatchFormPage() {
     control,
     handleSubmit,
     reset,
+    setValue,
   } = useForm<
     CreateBatchFormValues
   >({
@@ -141,6 +143,13 @@ export default function BatchFormPage() {
       capacity: undefined,
     },
   });
+
+  useEffect(() => {
+    if (editing) return;
+    idCodeApi.preview("BATCH")
+      .then((code) => setValue("batchCode", code, { shouldValidate: true }))
+      .catch(() => setError("Could not preview the next batch ID. It will be generated securely when saved."));
+  }, [editing, setValue]);
 
   const {
     control: updateControl,
@@ -979,7 +988,8 @@ export default function BatchFormPage() {
               {...field}
               fullWidth
               label="Batch Code"
-              placeholder="JAVA-SEP-02"
+              placeholder="Auto-generated"
+              slotProps={{ htmlInput: { readOnly: true } }}
               error={
                 !!fieldState.error
               }

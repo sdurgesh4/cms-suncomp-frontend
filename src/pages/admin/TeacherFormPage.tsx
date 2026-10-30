@@ -35,6 +35,8 @@ import {
 import {
   teacherApi,
 } from "../../api/teacherApi";
+import { idCodeApi } from "../../api/idCodeApi";
+
 
 import {
   userApi,
@@ -94,6 +96,13 @@ export default function TeacherFormPage() {
   /* =====================================================
      UPDATE FORM
      ===================================================== */
+
+  useEffect(() => {
+    if (isEditMode) return;
+    idCodeApi.preview("TEACHER")
+      .then((code) => createForm.setValue("employeeCode", code, { shouldValidate: true }))
+      .catch(() => setError("Could not preview the next ID. It will still be generated securely when saved."));
+  }, [isEditMode]);
 
   const updateForm =
     useForm<UpdateTeacherFormData>({
@@ -715,6 +724,7 @@ export default function TeacherFormPage() {
                     fullWidth
                     label="Employee Code"
                     required
+                    disabled
                     error={
                       !!fieldState.error
                     }

@@ -17,6 +17,7 @@ import { ArrowBack, Save } from "@mui/icons-material";
 import { useNavigate, useParams } from "react-router-dom";
 
 import { courseApi } from "../../api/courseApi";
+import { idCodeApi } from "../../api/idCodeApi";
 
 import type {
   Course,
@@ -44,6 +45,7 @@ const CourseFormPage = () => {
   const {
     control: createControl,
     handleSubmit: handleCreateSubmit,
+    setValue: setCreateValue,
     formState: { errors: createErrors },
   } = useForm<CreateCourseFormValues>({
     resolver: zodResolver(createCourseSchema),
@@ -57,6 +59,13 @@ const CourseFormPage = () => {
       level: "BEGINNER",
     },
   });
+
+  useEffect(() => {
+    if (isEditMode) return;
+    idCodeApi.preview("COURSE")
+      .then((code) => setCreateValue("code", code, { shouldValidate: true }))
+      .catch(() => setError("Could not preview the next course ID. It will be generated securely when saved."));
+  }, [isEditMode, setCreateValue]);
 
   const {
     control: updateControl,
@@ -269,7 +278,8 @@ const CourseFormPage = () => {
                 <TextField
                   {...field}
                   label="Course Code"
-                  placeholder="e.g. CPP101"
+                  placeholder="Auto-generated"
+                  slotProps={{ htmlInput: { readOnly: true } }}
                   fullWidth
                   required
                   error={Boolean(createErrors.code)}

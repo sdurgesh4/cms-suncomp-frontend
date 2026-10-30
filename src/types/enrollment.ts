@@ -6,6 +6,7 @@ export type EnrollmentStatus =
 
 export interface Enrollment {
   id: number;
+  enrollmentCode: string;
 
   studentId: number;
   studentCode: string;
