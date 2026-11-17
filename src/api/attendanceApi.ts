@@ -200,4 +200,94 @@ export const attendanceApi = {
 
     return response.data;
   },
+
+  // ==========================================
+// TEACHER ATTENDANCE APIs
+// ==========================================
+
+getTeacherBatchAttendance: async (
+  batchId: number,
+  attendanceDate: string,
+): Promise<BatchAttendanceRecord[]> => {
+  const response = await axios.get<BatchAttendanceRecord[]>(
+    `/teacher/batches/${batchId}/attendance`,
+    {
+      params: { attendanceDate },
+    },
+  );
+
+  return response.data;
+},
+
+createTeacherBatchAttendance: async (
+  request: BatchAttendanceRequest,
+): Promise<Attendance[]> => {
+  const response = await axios.post<Attendance[]>("/teacher/attendance/batch", request,);
+
+  return response.data;
+},
+
+getTeacherBatchDashboard: async (
+  batchId: number,
+  startDate: string,
+  endDate: string,
+): Promise<BatchAttendanceDashboard> => {
+  const response = await axios.get<BatchAttendanceDashboard>(
+    `/teacher/batches/${batchId}/attendance/dashboard`,
+    {
+      params: { startDate, endDate },
+    },
+  );
+
+  return response.data;
+},
+
+getTeacherLowAttendance: async (
+  batchId: number,
+  startDate: string,
+  endDate: string,
+  threshold = 75,
+): Promise<LowAttendanceStudent[]> => {
+  const response = await axios.get<LowAttendanceStudent[]>(
+    `/teacher/batches/${batchId}/attendance/low-attendance`,
+    {
+      params: { startDate, endDate, threshold },
+    },
+  );
+
+  return response.data;
+},
+
+getTeacherBatchReport: async (
+  batchId: number,
+  startDate: string,
+  endDate: string,
+): Promise<AttendanceReport[]> => {
+  const response = await axios.get<AttendanceReport[]>(
+    `/teacher/batches/${batchId}/attendance/report`,
+    {
+      params: { startDate, endDate },
+    },
+  );
+
+  return response.data;
+},
+
+getTeacherDailyReport: async (
+  batchId: number,
+  startDate: string,
+  endDate: string,
+): Promise<DailyAttendanceReport[]> => {
+  const response = await axios.get<DailyAttendanceReport[]>(
+    `/teacher/batches/${batchId}/attendance/daily-report`,
+    {
+      params: { startDate, endDate },
+    },
+  );
+
+  return response.data;
+},
+
+
+
 };
